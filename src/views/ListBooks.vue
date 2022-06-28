@@ -1,14 +1,18 @@
 <template>
     <div>
         Todos os livros cadastrados estão abaixo:
-
+        <div>
+            Você pode cadastrar livros clicando <router-link to="/addBook">aqui</router-link>.
+        </div>
         <ul v-if="books">
             <li v-for="book in books" :key="book">
-                {{ book }}
+                Título:{{ book.title }} - Criado em : {{ book.creationDate }} - Gênero: {{ getBookGenderByValue(book.genre) }}
+                Descrição: {{ book.description }}
+                <button @click="deleteBook(book)">Deletar</button>
             </li>
         </ul>
         <div v-if="!books || books.length < 1">
-            Não foram encontrados livros! Você pode cadastrá-los clicando <router-link to="/addBook">aqui</router-link>.
+            Não foram encontrados livros!
         </div>
     </div>
 </template>    
@@ -19,11 +23,38 @@
 
     export default {
         name: 'ListBooks',
+        data(){
+            return {
+                genreOptions: [
+                    { text: "Aventura", value: 0},
+                    { text: "Romance", value: 1},
+                    { text: "Terror", value: 2},
+                    { text: "Outros", value: 3}
+                ]
+            }
+        },
+        methods:{
+            getBookGenderByValue(value){
+                return this.genreOptions.find(option => option.value === value).text;
+            },
+            deleteBook(book){
+                fetch(`${mainUrl}${book.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response)
+                .then(() => {
+                    this.books = this.books.filter(b => b.id !== book.id);
+                })
+                .catch(error => console.log(error));
+            }
+        },
         setup() {
-            const books = ref(null);
-            const loading = ref(true);
-            const error = ref(null);
-
+            let books = ref(null);
+            let loading = ref(true);
+            let error = ref(null);
             function fetchData() {
             loading.value = true;
                 return fetch(mainUrl, {
