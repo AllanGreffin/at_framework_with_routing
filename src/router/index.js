@@ -28,6 +28,12 @@ const routes = [
     component: () =>
       import("../views/AddBook.vue"),
   },
+  {
+    path: "/editBook/:id",
+    name: "editBook",
+    component: () =>
+      import("../views/EditBook.vue"),
+  }
 ];
 
 const router = createRouter({

@@ -1,29 +1,29 @@
 <template>
-    <div>
-        Todos os livros cadastrados estão abaixo:
-        <div>
-            Você pode cadastrar livros clicando <router-link to="/addBook">aqui</router-link>.
-        </div>
-        <ul v-if="books">
-            <li v-for="book in books" :key="book">
-                Título:{{ book.title }} - Criado em : {{ book.creationDate }} - Gênero: {{ getBookGenderByValue(book.genre) }}
-                Descrição: {{ book.description }}
-                <button @click="deleteBook(book)">Deletar</button>
-                <router-link :to="`/editBook/${book.id}`" >Editar</router-link>
-            </li>
-        </ul>
-        <div v-if="!books || books.length < 1">
-            Não foram encontrados livros!
-        </div>
-    </div>
-</template>    
+    <form v-if="!loading">
+        <label for="title">Título</label>
+        <input id="title" type="text" v-model="book.title">
+        <br>
+        <label for="genre">Gênero</label>
+        <select v-model="book.genre">
+            <option v-for="option in genreOptions" :key="option" :value="option.value">
+                {{ option.text }}
+            </option>
+        </select>
+        <br>
+        <label for="description">Descrição</label>
+        <textarea id="description" type="text" v-model="book.description"></textarea>
+        <br>
+        <button @click="editBook()">Enviar</button>
+    </form>
+</template>
 
 <script>
     import { ref, onMounted  } from "vue";
     import { mainUrl } from '@/config/URIPath';
+    import { useRoute } from 'vue-router';
 
-    export default {
-        name: 'ListBooks',
+    export default{
+        name: 'AddBook',
         data(){
             return {
                 genreOptions: [
@@ -34,31 +34,30 @@
                 ]
             }
         },
-        methods:{
-            getBookGenderByValue(value){
-                return this.genreOptions.find(option => option.value === value).text;
-            },
-            deleteBook(book){
-                fetch(`${mainUrl}${book.id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+        methods: {
+            editBook(){
+                fetch(`${mainUrl}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this.book)
                 })
                 .then(response => response)
                 .then(() => {
-                    this.books = this.books.filter(b => b.id !== book.id);
                 })
-                .catch(error => console.log(error));
+                .catch(error => console.log(error))
             }
         },
         setup() {
-            let books = ref(null);
+            let book = ref(null);
             let loading = ref(true);
             let error = ref(null);
+            const route = useRoute()
+            // console.log(route.params.id);
             function fetchData() {
-            loading.value = true;
-                return fetch(mainUrl, {
+                loading.value = true;
+                return fetch(mainUrl + route.params.id, {
                     method: 'get',
                     headers: {
                     'content-type': 'application/json'
@@ -73,7 +72,7 @@
                     return res.json();
                 })
                 .then(json => {
-                    books.value = json;
+                    book.value = json;
                     console.log(json);
                 })
                 .catch(err => {
@@ -94,7 +93,7 @@
             });
 
             return {
-                books,
+                book,
                 loading,
                 error
             };
@@ -103,5 +102,4 @@
 </script>
 
 <style>
-
 </style>
