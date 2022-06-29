@@ -1,7 +1,7 @@
 <template>
     <form>
         <label for="title">Título</label>
-        <input id="title" type="text" v-model="book.title">
+        <input id="title" type="text" placeholder="Título do livro aqui" v-model="book.title" required minlength="3">
         <br>
         <label for="genre">Gênero</label>
         <select v-model="book.genre">
@@ -11,7 +11,7 @@
         </select>
         <br>
         <label for="description">Descrição</label>
-        <textarea id="description" type="text" v-model="book.description"></textarea>
+        <textarea id="description" placeholder="Insira uma descrição do livro aqui" type="text" v-model="book.description"></textarea>
         <br>
         <button @click="addBook()">Enviar</button>
     </form>
@@ -57,5 +57,36 @@
     };
 </script>
 
-<style>
+<style scoped>
+    form {
+        max-width: 900px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: left;
+    }
+    label {
+        margin-bottom: 10px;
+        align-self: flex-start;
+    }
+    input {
+        margin-bottom: 10px;
+        width: 100%;
+    }
+    textarea {
+        margin-bottom: 10px;
+        width: 100%;
+        height: 100px;
+    }
+    button {
+        margin-top: 10px;
+        height: 30px;
+        width: 200px;
+        align-self: center;
+        border-radius: 10px;
+    }
+    button:hover{
+        background-color: aqua;
+        border: 2px solid blue;
+    }
 </style>
